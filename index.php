@@ -11,7 +11,6 @@ header("Cross-Origin-Embedder-Policy: require-corp");
     <link rel="icon" type="image/png" href="/icon.png" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <meta name="description" content="GitNode - Test Node.js GitHub projects directly in your browser without a server.">
-    <meta name="keywords" content="GitNode, Node.js, GitHub, browser, JavaScript">
     <meta name="author" content="pooiod7">
     <meta property="og:title" content="GitNode">
     <meta property="og:description" content="Test Node.js GitHub projects in your browser instantly with GitNode.">
@@ -44,7 +43,6 @@ header("Cross-Origin-Embedder-Policy: require-corp");
     var data;
         async function fetchAndProcessZip() {
             var apiUrl = "/api/get/index.php?rep="+(window.location.pathname.slice(1) || "pooiod/NodeHome");
-            // document.querySelector('iframe').contentWindow.postMessage("Downloading repository...", '*');
             try {
                 const response = await fetch(apiUrl);
                 var fol = 0;

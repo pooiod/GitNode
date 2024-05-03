@@ -15,6 +15,7 @@ header("Cross-Origin-Embedder-Policy: require-corp");
     <meta name="author" content="pooiod7">
     <meta property="og:title" content="GitNode">
     <meta property="og:description" content="Test Node.js GitHub projects in your browser instantly with GitNode.">
+    <script>window.parent.postMessage({url:window.location.pathname}, '*');</script>
     <style>
         body {
             background-color: white;
@@ -42,6 +43,10 @@ header("Cross-Origin-Embedder-Policy: require-corp");
     let webcontainerInstance;
     
     var repository = (window.location.pathname.slice(1) || "pooiod/NodeHome");
+    
+    if (!window.location.hash) {
+        window.location.hash = "/";
+    }
     
     var data;
         async function fetchAndProcessZip() {
@@ -96,6 +101,13 @@ header("Cross-Origin-Embedder-Policy: require-corp");
                     data = fileData[Object.keys(fileData)[0]];
                     data = data[Object.keys(data)[0]];
                     
+                    data = JSON.parse(
+                    JSON.stringify(data)
+                    .replace(/res\.send\([']/g, 'res.send(\'<script>window.parent.postMessage({url:window.location.pathname}, \'*\');<\/script>')
+                    .replace(/res\.send\(["]/g, 'res.send("<script>window.parent.postMessage({url:window.location.pathname}, \'*\');<\/script>')
+                    .replace(/res\.send\([`]/g, 'res.send(`<script>window.parent.postMessage({url:window.location.pathname}, \'*\');<\/script>')
+                    ); // this is a hacky fix, but it works
+
                     // document.querySelector('iframe').contentWindow.postMessage(JSON.stringify(data, null, 2), '*');
                 } else {
                     document.querySelector('iframe').contentWindow.postMessage("\r\n" + esponse.status, '*');
@@ -108,6 +120,8 @@ header("Cross-Origin-Embedder-Policy: require-corp");
                 data = false;
             }
         }
+        
+        var containerurl = false;
 
         window.addEventListener('load', async () => {
             await fetchAndProcessZip();
@@ -141,6 +155,13 @@ header("Cross-Origin-Embedder-Policy: require-corp");
             } catch(error) {
                 error = error;
             }
+            try {
+                if ("url" in event.data) {
+                    window.location.hash = event.data.url;
+                }
+            } catch(error) {
+                error = error;
+            }
         });
         
         async function installDependencies() {
@@ -169,10 +190,27 @@ header("Cross-Origin-Embedder-Policy: require-corp");
             // Wait for `server-ready` event
             webcontainerInstance.on('server-ready', (port, url) => {
             document.querySelector('iframe').contentWindow.postMessage("\r\nLoading preview...", '*');
+                var page = window.location.hash.slice(1);
+                if (url.endsWith('/')) {
+                  url = url.slice(0, -1);
+                } 
+                containerurl = url;
+                url += page;
                 document.querySelector('iframe').src = url;
                 console.log("page loaded");
             });
         }
+        
+        window.onhashchange = function() {
+            if (containerurl) {
+                var page = window.location.hash.slice(1);
+                var url = containerurl;
+                if (url.endsWith('/')) {
+                  url = url.slice(0, -1);
+                } url += page;
+                document.querySelector('iframe').src = url;
+            }
+        };
     </script>
 </body>
 </html>

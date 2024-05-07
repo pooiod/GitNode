@@ -6,6 +6,6 @@
     "nodemon": "latest"
   },
   "scripts": {
-    "start": "nodemon nodehome.js"
+    "start": "nodemon index.js"
   }
 }
